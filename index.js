@@ -11,7 +11,7 @@ const app = express();
 // middleware
 app.use(
   cors({
-    origin: ["*"],
+    origin: ["http://localhost:3000"],
     credentials: true,
   })
 );
@@ -86,6 +86,49 @@ async function run() {
         // return user
         res.json({ message: "Login success", user });
       } catch (err) {
+        res.status(500).json({ message: "Server error" });
+      }
+    });
+    // Products
+    app.post("/products", async (req, res) => {
+      try {
+        const { name, image, description, rating, price, category, userEmail } =
+          req.body;
+
+        // Validate required fields
+        if (
+          !name ||
+          !image ||
+          !description ||
+          !rating ||
+          !price ||
+          !category ||
+          !userEmail
+        ) {
+          return res.status(400).json({ message: "All fields are required" });
+        }
+
+        // Create product object
+        const newProduct = {
+          name,
+          image,
+          description,
+          rating: Number(rating),
+          price: Number(price),
+          category,
+          userEmail,
+          createdAt: new Date(),
+        };
+
+        // Insert into products collection
+        const result = await productsCollection.insertOne(newProduct);
+
+        res.status(201).json({
+          message: "Product added successfully",
+          productId: result.insertedId,
+        });
+      } catch (err) {
+        console.error(err);
         res.status(500).json({ message: "Server error" });
       }
     });

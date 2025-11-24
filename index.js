@@ -43,6 +43,35 @@ async function run() {
     const database = client.db(process.env.DB_NAME);
     const usersCollection = database.collection("users");
     const productsCollection = database.collection("products");
+
+    // POSTING
+    // Register
+    app.post("/register", async (req, res) => {
+      try {
+        const { name, email, password, image } = req.body;
+        // Fields check
+        if (!name || !email || !password || !image)
+          return res.status(400).json({ message: "Some fields are missing" });
+        // Exiting user check
+        const exist = await usersCollection.findOne({ email });
+        if (exist)
+          return res.status(400).json({ message: "User already exists" });
+        // User object
+        const newUser = {
+          name,
+          email,
+          password,
+          image: image || "",
+          createdAt: new Date(),
+        };
+        // Insert data
+        await usersCollection.insertOne(newUser);
+
+        res.json({ message: "Registered successfully", user: newUser });
+      } catch (err) {
+        res.status(500).json({ message: "Server error" });
+      }
+    });
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();

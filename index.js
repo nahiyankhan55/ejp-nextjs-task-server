@@ -1,5 +1,5 @@
 import express from "express";
-import { MongoClient, ServerApiVersion } from "mongodb";
+import { MongoClient, ObjectId, ServerApiVersion } from "mongodb";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
@@ -55,6 +55,22 @@ async function run() {
           .toArray();
 
         res.json(latest);
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Server error" });
+      }
+    });
+    // Get product by ID
+    app.get("/products/:id", async (req, res) => {
+      try {
+        const { id } = req.params;
+        const product = await productsCollection.findOne({
+          _id: new ObjectId(id),
+        });
+        if (!product)
+          return res.status(404).json({ message: "Product not found" });
+
+        res.json(product);
       } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Server error" });

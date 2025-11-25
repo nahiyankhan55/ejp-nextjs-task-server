@@ -44,6 +44,23 @@ async function run() {
     const usersCollection = database.collection("users");
     const productsCollection = database.collection("products");
 
+    // READING
+    // Get latest products
+    app.get("/latest/products", async (req, res) => {
+      try {
+        const latest = await productsCollection
+          .find({})
+          .sort({ createdAt: -1 }) // newest first
+          .limit(6)
+          .toArray();
+
+        res.json(latest);
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Server error" });
+      }
+    });
+
     // POSTING
     // Register
     app.post("/register", async (req, res) => {

@@ -86,6 +86,23 @@ async function run() {
         res.status(500).json({ message: "Server error" });
       }
     });
+    // Get products by user email
+    app.get("/products/user/:email", async (req, res) => {
+      try {
+        const { email } = req.params;
+
+        // Find all products created by this user
+        const userProducts = await productsCollection
+          .find({ userEmail: email })
+          .sort({ createdAt: -1 }) // newest first
+          .toArray();
+
+        res.json(userProducts);
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Server error" });
+      }
+    });
 
     // POSTING
     // Register

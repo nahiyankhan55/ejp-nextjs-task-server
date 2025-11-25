@@ -76,6 +76,16 @@ async function run() {
         res.status(500).json({ message: "Server error" });
       }
     });
+    // Get all products
+    app.get("/products", async (req, res) => {
+      try {
+        const allProducts = await productsCollection.find({}).toArray();
+        res.json(allProducts);
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Server error" });
+      }
+    });
 
     // POSTING
     // Register
